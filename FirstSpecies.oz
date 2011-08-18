@@ -184,5 +184,4 @@ end
 %{GUtils.setRandomGeneratorSeed 0} % always find different solution
 {SDistro.exploreOne {GUtils.extendedScriptToScript FirstSpecies
 		     unit}
- unit(order:size
-      value:random)}
+ unit(order:size)}

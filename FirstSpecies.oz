@@ -1,5 +1,5 @@
 % This file is a modification / extension of the Strasheela example provided in
-% $STRASHEELA/exmaples/Counterpoint-Examples/Fuxian-Counterpoint-with-Scale.oz
+% $STRASHEELA/examples/Counterpoint-Examples/Fuxian-Counterpoint-with-Scale.oz
 %
 % My goal is to write an implementation of four-voice strict counterpoint, or
 % get as far as possible. I will base my rule set on the counterpoint course I

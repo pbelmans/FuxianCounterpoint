@@ -10,6 +10,9 @@
 declare
 [ET12] = {ModuleLink ['x-ozlib://anders/strasheela/ET12/ET12.ozf']}
 
+%
+% the main procedure
+%
 proc {FirstSpecies Args ?MyScore}
    % the cantus exercise in my counterpoint course, placed in a bass range
    CantusFirmus = {Map ['C'#3 'E'#3 'A'#3 'G'#3 'E'#3 'F'#3 'D'#3 'C'#3]
@@ -34,7 +37,9 @@ in
    % place rules here
 end
 
+%
 % create a voice based on a list of pitches, to be used in a Lilypond context
+%
 fun {MakeVoice Pitches MyScale VoiceName}
    {Score.makeScore2
     seq(info:lily("\\set Staff.instrumentName = \""#VoiceName#"\"")
@@ -42,14 +47,50 @@ fun {MakeVoice Pitches MyScale VoiceName}
 			       note(duration: 4
 				    pitch: Pitch
 				    inScaleB:{FD.int 0#1}
+				    getScales:proc {$ Self Scales} 
+						 Scales = [MyScale]
+					      end
+				    isRelatedScale:proc {$ Self Scale B} B=1 end
 				    amplitude: 80)
 			    end})
     add(note:HS.score.scaleNote)}
 end
 
+
+%
+% Scale database
+%
+
+MyScales = scales(1: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[0]
+			   comment:'Ionian')
+		  2: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[2]
+			   comment:'Dorian')
+		  3: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[4]
+			   comment:'Phrygian')
+		  4: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[5]
+			   comment:'Lydian')
+		  5: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[7]
+			   comment:'Mixolydian')
+		  6: scale(pitchClasses:[0 2 4 5 7 9 11]
+			   roots:[9]
+			   comment:'Aeolian'))
+
+{HS.db.setDB unit(scaleDB:MyScales)}
+
+
+%
+% Rules
+%
+
 %
 % Generate output
 %
+
 {GUtils.setRandomGeneratorSeed 0} % always find different solution
 {SDistro.exploreOne {GUtils.extendedScriptToScript FirstSpecies
 		     unit}

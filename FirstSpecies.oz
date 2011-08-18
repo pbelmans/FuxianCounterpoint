@@ -38,6 +38,7 @@ in
    {OnlyDiatonicPitches CounterpointVoice}
    {RestrictMelodicIntervals CounterpointVoice}
    {StartAndEndWithPerfectConsonance CounterpointVoice}
+   {OnlyConsonances CounterpointVoice}
 end
 
 %
@@ -108,6 +109,14 @@ end
 proc {GetInterval Note1 Note2 Interval}
    Interval = {FD.decl}
    {FD.distance {Note1 getPitch($)} {FD.plus {Note2 getPitch($)} 12} '=:' Interval}
+end
+
+proc {IsConsonance Interval}
+   Interval :: [0 3 4 7 8 9]
+end
+
+proc {CollapseOctave Interval Reduced}
+   {FD.modI Interval 12 Reduced}
 end
 
 
@@ -191,7 +200,6 @@ in
       FirstNote = Notes.1
       LastNote = {List.last Notes}
    in
-      %{Browse {Map Notes getPitch($) fun {$ Xs} Xs end}}
       {IsSuitableInterval
        {FirstNote getPitch($)}
        {{GetSimultaneousNote FirstNote} getPitch($)}
@@ -203,11 +211,23 @@ in
    end
 end
 
-
-
-
-
-
+%proc {OnlyConsonances CounterPointVoice}
+%   {ForAll {CounterpointVoice getItems($)}
+%    proc {$Note}
+%       {IsConsonance {GetInterval Note {GetSimultaneousNote Note}}}
+%    end
+%   }
+%end
+%% The interval between every pair of simultaneous note pitches is consonant
+proc {OnlyConsonances CounterPoint}
+   %% apply rule IsConsonance on each pair of simultaneous notes
+   {ForAll {CounterPoint getItems($)}
+    proc {$ Note}
+       {IsConsonance
+	{CollapseOctave {GetInterval Note {GetSimultaneousNote Note}}}
+       }
+    end}
+end
 
 %
 % Generate output

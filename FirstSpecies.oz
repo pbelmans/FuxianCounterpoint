@@ -17,8 +17,8 @@ proc {FirstSpecies Args ?MyScore}
    % the cantus exercise in my counterpoint course, placed in a bass range
    CantusFirmus = {Map ['C'#3 'E'#3 'A'#3 'G'#3 'E'#3 'F'#3 'D'#3 'C'#3]
 		   ET12.pitch}
-   % restricting the domain of the counterpoint voice to an alto (alike) range
-   CounterpointDomain = {ET12.pitch'C'#4}#{ET12.pitch 'G'#5}
+   % restricting the domain of the counterpoint voice to an alto range
+   CounterpointDomain = {ET12.pitch'G'#3}#{ET12.pitch 'F'#5}
 
    MyScale = {Score.makeScore scale(duration:4 startTime:0 transposition:0)
 	      unit(scale:HS.score.scale)}
@@ -37,6 +37,7 @@ in
    % place rules here
    {OnlyDiatonicPitches CounterpointVoice}
    {RestrictMelodicIntervals CounterpointVoice}
+   {StartAndEndWithPerfectConsonance CounterpointVoice}
 end
 
 %
@@ -99,7 +100,7 @@ proc {SetScaleRoot MyScale CantusFirmus}
 end
 
 % Returns the (single) note which is simultaneous to MyNote.
-fun {GetSimNote MyNote}
+fun {GetSimultaneousNote MyNote}
    % getSimultaneousItems returns a list with the simultaneous items
    {MyNote getSimultaneousItems($ test:isNote)}.1
 end
@@ -175,6 +176,37 @@ in
       %{PreferSteps Intervals}
    end
 end
+
+local
+   AllowedIntervals = [~12 0 12]
+   proc {IsSuitableInterval CounterpointPitch CantusPitch}
+      Interval
+   in
+      Interval :: {Map AllowedIntervals fun {$ I} I + 12 end}
+      Interval =: CounterpointPitch - CantusPitch + 12
+   end
+in
+   proc {StartAndEndWithPerfectConsonance Voice}
+      Notes = {Voice getItems($)}
+      FirstNote = Notes.1
+      LastNote = {List.last Notes}
+   in
+      %{Browse {Map Notes getPitch($) fun {$ Xs} Xs end}}
+      {IsSuitableInterval
+       {FirstNote getPitch($)}
+       {{GetSimultaneousNote FirstNote} getPitch($)}
+      }
+      {IsSuitableInterval
+       {LastNote getPitch($)}
+       {{GetSimultaneousNote LastNote} getPitch($)}
+      }
+   end
+end
+
+
+
+
+
 
 
 %

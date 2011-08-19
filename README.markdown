@@ -1,4 +1,4 @@
 About
 -----
 
-More information will come. I'm implementing strict counterpoint in Strasheela.
+For more information, see the [FuxianCounterpoint wiki](https://github.com/pbelmans/FuxianCounterpoint/wiki).

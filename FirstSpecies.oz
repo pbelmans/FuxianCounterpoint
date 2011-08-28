@@ -11,9 +11,9 @@ declare
 [ET12] = {ModuleLink ['x-ozlib://anders/strasheela/ET12/ET12.ozf']}
 
 %
-% the main procedure
+% the problem specification
 %
-proc {FirstSpecies Args ?MyScore}
+proc {FirstSpecies Arguments ?MyScore}
    % the cantus exercise in my counterpoint course, placed in a bass range
    CantusFirmus = {Map ['C'#3 'E'#3 'A'#3 'G'#3 'E'#3 'F'#3 'D'#3 'C'#3]
 		   ET12.pitch}
@@ -39,6 +39,8 @@ in
    {RestrictMelodicIntervals CounterpointVoice}
    {StartAndEndWithPerfectConsonance CounterpointVoice}
    {OnlyConsonances CounterpointVoice}
+   {NoSeventhInThreeSteps CounterpointVoice}
+   {NoParallelFifthsOrOctaves CounterpointVoice}
 end
 
 %
@@ -111,8 +113,12 @@ proc {GetInterval Note1 Note2 Interval}
    {FD.distance {Note1 getPitch($)} {FD.plus {Note2 getPitch($)} 12} '=:' Interval}
 end
 
+proc {GetIntervals Notes Intervals}
+   Intervals = {Pattern.map2Neighbours Notes GetInterval}
+end
+
 proc {IsConsonance Interval}
-   Interval :: [0 3 4 7 8 9]
+   Interval :: [0 3 7 8 9] % fourths are no consonance in first species
 end
 
 proc {CollapseOctave Interval Reduced}
@@ -211,16 +217,7 @@ in
    end
 end
 
-%proc {OnlyConsonances CounterPointVoice}
-%   {ForAll {CounterpointVoice getItems($)}
-%    proc {$Note}
-%       {IsConsonance {GetInterval Note {GetSimultaneousNote Note}}}
-%    end
-%   }
-%end
-%% The interval between every pair of simultaneous note pitches is consonant
 proc {OnlyConsonances CounterPoint}
-   %% apply rule IsConsonance on each pair of simultaneous notes
    {ForAll {CounterPoint getItems($)}
     proc {$ Note}
        {IsConsonance
@@ -228,6 +225,34 @@ proc {OnlyConsonances CounterPoint}
        }
     end}
 end
+
+proc {NoSeventhInThreeSteps Voice}
+   % TODO expand this procedure
+   %{Browse {Pattern.mapNeighbours {Voice getItems($)} 3 GetIntervals}}
+   {Browse 'hello world'}
+end
+
+proc {NoParallelFifthsOrOctaves Voice}
+   Intervals
+
+   % TODO get rid of this stupid helper
+   proc {HelperProcedure Interval1 Interval2}
+      {PreventParallels Interval1 Interval2 0}
+   end
+   
+   proc {PreventParallels Interval1 Interval2 B}
+      B1 = {FD.reified.distance Interval1 Interval2 '=:' 0}
+      B2 = Interval1 =: 7 % TODO expand
+   in
+      {FD.disj B1 B2 0}
+   end
+in
+   Intervals = {List.zip {Voice getItems($)}
+		{Map {Voice getItems($)} GetSimultaneousNote}
+		GetInterval}
+   {Pattern.for2Neighbours Intervals HelperProcedure}
+end
+
 
 %
 % Generate output
